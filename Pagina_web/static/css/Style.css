@@ -1,0 +1,82 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+body{
+
+    background-color: dimgrey;
+    font-family: Impact, Charcoal, sans-serif;
+}
+
+a{
+
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    display: inline-block;
+    text-decoration: none;
+    padding: 10px;
+    background: steelblue;
+    box-shadow: 0 7px 0 #1D64A6;
+
+}
+
+a:hover{
+    background: #a10021;
+    box-shadow: 0 3px 0 #360002;
+}
+
+a:active{
+    box-shadow: none;
+}
+
+.contenedor{
+    margin: 0;
+    padding-top: 800px;
+    background-image: url('../Imagenes/track.jpg') ;
+    background-repeat: no-repeat;
+    background-position: top;
+
+}
+
+.principal1{
+    margin:0 0 10px 1345px;
+    font-size: 30px;
+    padding: 15px;
+}
+
+.principal2{
+    font-size: 30px;
+    padding: 15px;
+}
+
+h1{
+    text-align: center;
+    font-size: 250%;
+    font-weight: bold;
+    margin: 0;
+    padding: 10px;
+    color: white;
+}
+
+p{
+    text-align: justify;
+    width: 60%;
+    margin: auto;
+}
+
+h3,.rrr{
+    text-align: center;
+}
+
+footer{
+    padding: 8px;
+    text-align: center;
+}
+
+.imagen{
+    height: 400px;
+    display: block;
+    margin: auto;
+}
