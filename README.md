@@ -42,8 +42,9 @@ There is no model yet.
 The following describes the responsibility of each component in the above folder structure:
 * *tests*: include notebooks to show how the functions and classes defined in the [data](/data/) and [model](/model/) work
 * *data*: download and preprocess the data
-* *model*: train, test and infer
+* *model*: just the model
 * *flask_app.py*: the web application
+* *task.py*: training and tests processes
 * *README.md*: to describe the project (this file)
 * *requirements.txt*: store all necessary libraries for this branch to work
 
