@@ -14,7 +14,7 @@ The main branch of this repository should always correspond to the approach with
 
 ### Ranking
 
-| User     | Branch | F1-score |
+| User     | Branch | F1-score (test) |
 | ---      | ---      | ---      |
 | [diegoxfx](https://github.com/diegoxfx) |          |          |
 | [TheBaxes](https://github.com/TheBaxes) |          |          |
