@@ -1,5 +1,9 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
+import cv2
+import base64
 import os
+import io
+from imageio import imread
 import sqlite3 as sql
 
 app = Flask(__name__)
@@ -36,9 +40,29 @@ def upload():
         print(destination)
         file.save(destination)
 
-    
     return render_template('load_image.html')
 
+@app.route("/saveImage" , methods=['POST'])
+def image():
+
+    if(request.get_json()):
+        image = request.get_json()[22:]  #removing the image header
+        decoded_image = base64.b64decode(image)
+        img = imread(io.BytesIO(decoded_image))
+
+        
+
+        #This code is useful if the image is needed to be saved as jpg instead of a vector
+        # image_to_be_saved = "./images/current_image.jpg"
+        # with open(image_to_be_saved,'wb' ) as img:
+        #      img.write(decoded_image)
+
+        resp = jsonify(success=True)
+    else:
+        resp = jsonify(success=False)
+
+    
+    return resp
 
 if __name__ == '__main__':
     #app.run(host='0.0.0.0', debug=True, port=8000)

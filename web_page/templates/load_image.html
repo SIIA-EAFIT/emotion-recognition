@@ -3,7 +3,7 @@
 
 
 {% block title %}
-Descripción del proyecto
+Try it
 {% endblock %}
 
 {% block content %}
@@ -35,15 +35,43 @@ Descripción del proyecto
 
 <!-- Page Content -->
 
+<h2> You can upload an image from your computer.. </h2>
+<div class="container"style="display:flex;justify-content:center;align-items:center;">
 
+    <br />
+    <br />
+    <br />
+    <br />
 
+        <form id="upload-form" action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+            <input class="button" type="file" name="file" accept="image/*" multiple>
 
+            </br>
 
-<form id="upload-form" action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
-    <input type="file" name="file" accept="image/*" multiple>
+            <input type="submit" value="Upload">
+        </form>
+
+</div>
+<br>
+<h2> Or take one right now!! </h2>
+<div class="container"style="display:flex;justify-content:center;align-items:center;">
+
+        <div class="booth">
+            <video id="video" width="380" height="300"></video>
+            <a href="#" id="capture" class="boot-capture-button"> Take photo </a>
+            <canvas id="canvas" width="400" height="300"></canvas>
+            <img id="photo" src= "https://scontent.feoh6-1.fna.fbcdn.net/v/t1.0-9/47441256_942104325984469_7365352421347819520_n.jpg?_nc_cat=102&_nc_ht=scontent.feoh6-1.fna&oh=943f844e4ebf138b96815b1918c8a1db&oe=5C9B3A6F"
+                width="380"
+                height="300"
+                alt="Your photo">
+        </div>
     
-    <input type="submit" value="Upload">
-</form>
+</div>
+
+<script src="../static/JS/photo.js"></script>
+
+
+
 
 <br />
 <br />
