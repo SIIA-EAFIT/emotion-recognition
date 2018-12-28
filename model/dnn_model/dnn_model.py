@@ -1,14 +1,15 @@
-from tensorflow.estimator import LinearClassifier
+from tensorflow.estimator import DNNClassifier
 import tensorflow as tf
 import numpy as np
 
 
-class LinearModel:
+class DNNModel:
 
     def __init__(self):
         self.classifier = None
 
     def train(self, train_data, validation_data=None,
+              hidden_units=[1024, 512, 256, 128],
               learning_rate=0.01, batch_size=500, model_dir=None,
               epochs=10, n_classes=7, checkpoint_path=None,
               save_checkpoint_steps=5, keep_checkpoint_max=1):
@@ -22,8 +23,9 @@ class LinearModel:
             save_checkpoints_steps=save_checkpoint_steps,
             keep_checkpoint_max=keep_checkpoint_max)
         
-        self.classifier = LinearClassifier(
+        self.classifier = DNNClassifier(
             feature_columns=self._feature_columns(),
+            hidden_units=hidden_units,
             n_classes=n_classes,
             optimizer=optimizer,
             config=config,
@@ -41,10 +43,11 @@ class LinearModel:
                 validation_metrics = self.classifier.evaluate(input_fn=evaluate_validation_fn, name='validation')
                 print("validation", validation_metrics)
 
-    def load_model(self, model_dir, n_classes=7):
-        self.classifier = LinearClassifier(feature_columns=self._feature_columns(),
+    def load_model(self, model_dir, hidden_units=[1024, 512, 256, 128], n_classes=7):
+        self.classifier = DNNClassifier(feature_columns=self._feature_columns(),
+                                           hidden_units=hidden_units,
                                            model_dir=model_dir, n_classes=n_classes)
-        self.classifier.latest_checkpoint() 
+        self.classifier.latest_checkpoint()
 
     def predict(self, X, tfrecord=False):
         predict_fn = None
@@ -75,7 +78,6 @@ class LinearModel:
         def _input_fn():
             features = {}
             features['image'] = X
-            print(features)
             dataset = tf.data.map(features)
             iterator = dataset.make_one_shot_iterator()
             image = iterator.get_next()

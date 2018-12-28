@@ -1,9 +1,9 @@
-from tensorflow.estimator import LinearClassifier
+from tensorflow.estimator import Estimator
 import tensorflow as tf
 import numpy as np
 
 
-class LinearModel:
+class CNNModel:
 
     def __init__(self):
         self.classifier = None
@@ -22,10 +22,13 @@ class LinearModel:
             save_checkpoints_steps=save_checkpoint_steps,
             keep_checkpoint_max=keep_checkpoint_max)
         
-        self.classifier = LinearClassifier(
-            feature_columns=self._feature_columns(),
-            n_classes=n_classes,
-            optimizer=optimizer,
+        feature_columns = {tf.feature_column.numeric_column('image', shape=(1, 48, 48, 1))}
+        self.classifier = Estimator(
+            model_fn=self._model_fn,
+            params={
+                "feature_columns": feature_columns,
+                "optimizer": optimizer
+            },
             config=config,
             model_dir=model_dir,
             warm_start_from=checkpoint_path)
@@ -42,9 +45,13 @@ class LinearModel:
                 print("validation", validation_metrics)
 
     def load_model(self, model_dir, n_classes=7):
-        self.classifier = LinearClassifier(feature_columns=self._feature_columns(),
-                                           model_dir=model_dir, n_classes=n_classes)
-        self.classifier.latest_checkpoint() 
+        self.classifier = Estimator(
+            model_fn=self._model_fn,
+            params={
+            "feature_columns": self.feature_columns
+            },
+            model_dir=model_dir)
+        self.classifier.latest_checkpoint()
 
     def predict(self, X, tfrecord=False):
         predict_fn = None
@@ -57,6 +64,36 @@ class LinearModel:
             shuffle=False)
             predict_fn = predict_input_fn
         return self.classifier.predict(input_fn=predict_fn)
+
+
+    def _model_fn(self, features, labels, mode, params):
+        net = tf.feature_column.input_layer(features, params['feature_columns'])
+        input_layer = tf.reshape(net, shape=(-1, 48, 48, 1))
+        conv1 = tf.layers.conv2d(inputs=input_layer, filters=10, kernel_size=(5, 5), activation=tf.nn.relu) 
+        pool1 = tf.layers.max_pooling2d(inputs=conv1, pool_size=(2,2), strides=(2,2))
+        pool1 = tf.layers.flatten(inputs=pool1)
+        fc1 = tf.layers.dense(inputs=pool1, units=1024, activation=tf.nn.relu)
+        dropout = tf.layers.dropout(inputs=fc1, rate=0.5, training = mode == tf.estimator.ModeKeys.TRAIN)
+        logits = tf.layers.dense(inputs=dropout, units=7)
+        predictions = {
+            "classes": tf.argmax(input=logits, axis=1),
+            "probabilities": tf.nn.softmax(logits, name="softmax")
+        }
+
+        if mode == tf.estimator.ModeKeys.PREDICT:
+            return tf.estimator.EstimatorSpec(mode=mode, predictions=predictions)
+        
+        loss = tf.losses.sparse_softmax_cross_entropy(labels=labels, logits=logits)
+        
+        if mode == tf.estimator.ModeKeys.TRAIN:
+            optimizer = params["optimizer"]
+            train_op = optimizer.minimize(loss=loss, global_step=tf.train.get_global_step())
+            return tf.estimator.EstimatorSpec(mode=mode, loss=loss, train_op=train_op)
+        
+        eval_metric_ops = {
+            "accuracy": tf.metrics.accuracy(labels=labels, predictions=predictions["classes"])
+        }
+        return tf.estimator.EstimatorSpec(mode=mode, loss=loss, eval_metric_ops=eval_metric_ops)            
 
     def input_fn(self, data, batch_size, shuffle=False):
         def _input_fn():
@@ -75,16 +112,12 @@ class LinearModel:
         def _input_fn():
             features = {}
             features['image'] = X
-            print(features)
             dataset = tf.data.map(features)
             iterator = dataset.make_one_shot_iterator()
             image = iterator.get_next()
             return image
 
         return _input_fn
-
-    def _feature_columns(self):
-        return {tf.feature_column.numeric_column('image', shape=(1,2304))}
           
     def _extract_fn(self, data_record):
         features_keys = {
@@ -94,6 +127,7 @@ class LinearModel:
         features = {}
         sample = tf.parse_single_example(data_record, features_keys)
         image = tf.decode_raw(sample['image'], tf.float32)
+        image = tf.reshape(image, (48, 48, 1))
         label = tf.decode_raw(sample['label'], tf.int32)
         features['image'] = image
         return features, label
