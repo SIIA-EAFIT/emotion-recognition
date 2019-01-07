@@ -12,13 +12,10 @@ def from_hdf_to_tf_record(hdf_path, tf_record_path_and_name,
                           x_dict_name , y_dict_name, batch_size = 1000, ):
     
     dataset = h5py.File(hdf_path, 'r')
-    
     # open the TFRecords file
     writer = tf.python_io.TFRecordWriter(tf_record_path_and_name)
-
     n_examples , width , height = dataset[x_dict_name].shape
     
-
     for i in range(0 , n_examples, batch_size):
 
         # print how many images are saved every 1000 images
@@ -42,8 +39,6 @@ def from_hdf_to_tf_record(hdf_path, tf_record_path_and_name,
             
             # Serialize to string and write on the file
             writer.write(example.SerializeToString())
-        
-        
-        
+           
     writer.close()
     sys.stdout.flush()
