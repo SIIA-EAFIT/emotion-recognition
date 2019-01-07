@@ -12,12 +12,10 @@ from data.__init__ import Dataset
 from data import utils_functs
 from data  import numpy_to_tf_record as ntr
 
-
-
 class Emotion:
 
     def __init__(self, download = False):
-
+        
         self.hdf_dataset = '../data/dataset/dataset.hdf5'
         self.tf_training_record_path = '../data/training_record'
         self.tf_validation_record_path = '../data/validation_record'
@@ -25,15 +23,11 @@ class Emotion:
         #If the dataset needs to be downloaded
         if (download):
             self.dataset = Dataset(download=True, gen_images=True, gen_hdf5=True)
-
         self.load_data()
-
-
 
     def load_data(self):
 
-        """Loading data from the hdf5 file
-        
+        """Loading data from the hdf5 file        
         """
         ntr.from_hdf_to_tf_record(self.hdf_dataset, self.tf_training_record_path
         , x_dict_name = "train_img" , y_dict_name = "train_labels"
@@ -42,7 +36,6 @@ class Emotion:
         ntr.from_hdf_to_tf_record(self.hdf_dataset ,self.tf_validation_record_path , 
             x_dict_name = "val_img" , y_dict_name = "val_labels"
         )
-
 
         self.main()
 
@@ -54,11 +47,9 @@ class Emotion:
              optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
 
         config = tf.estimator.RunConfig(
-                save_summary_steps=10
-            
+                save_summary_steps=10            
         )
-            
-
+           
         classifier = Estimator(
             model_fn= alex_net.model,
             params={
@@ -86,9 +77,5 @@ class Emotion:
                                             epochs = epochs))
 
         print('\nTest set accuracy: {accuracy:0.3f}\n'.format(**eval_result))
-
-
-    
-    
 
 emotion = Emotion()

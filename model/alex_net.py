@@ -9,62 +9,45 @@ def model(features , labels , mode, params):
         n_classes = params['number_of_classes']
         batch_size = params['batch_size']
         training = mode == tf.estimator.ModeKeys.TRAIN
-
-        
+     
         ################################################################################
         
         #Input and dealing with the first dimension which is the  unknown batch size
         net = tf.keras.Input( shape = (  img_height , img_width ) , tensor = features, batch_size = batch_size)
-
         net = tf.reshape(features, shape=( -1 , img_height, img_width, n_channels))
-
         
         #Conv -> Activation -> Maxpooling
         net = tf.layers.conv2d(inputs= net , filters=16, strides=(2,2) , kernel_size=(5, 5), 
                                  activation=tf.nn.relu, name="conv_0")
-        
+       
         #Conv -> Activation
         net = tf.layers.conv2d(inputs= net , filters=48, strides=(1,1) , kernel_size=(3, 3), 
                                  activation=tf.nn.relu, name="conv_1")  
         
         #Conv -> Activation  ; Conv -> Activation
-
         net = tf.layers.conv2d(inputs= net , filters=96, strides=(1,1) , kernel_size=(3, 3), 
-                                 activation=tf.nn.relu, name="conv_2")  
-        
+                                 activation=tf.nn.relu, name="conv_2")
         net = tf.layers.conv2d(inputs= net , filters=96, strides=(1,1) , kernel_size=(3, 3), 
                                  activation=tf.nn.relu, name="conv_3")
         
         #Conv -> Activation -> Maxpooling
         net = tf.layers.conv2d(inputs= net , filters=48, strides=(1,1) , kernel_size=(3, 3), 
                                  activation=tf.nn.relu, name="conv_4")  
-        
         net = tf.layers.max_pooling2d(inputs= net, pool_size=(2, 2), strides=(2, 2))
-        
         
         #Flatten -> dropout
         net = tf.layers.flatten(inputs=net, name = "flatten")
-        
         net = tf.layers.dropout(inputs=net, rate=0.2, training = training)
         
-
         #Dense -> ReLU -> Dropout -> Dense -> Relu -> Logits
         net = tf.layers.dense(inputs=net, units=1024, activation=tf.nn.relu, name='fc1')    
-        
-
         net = tf.layers.dropout(inputs=net, rate=0.2, training = training)
-        
-        net = tf.layers.dense(inputs=net, units=1024,  activation=tf.nn.relu, name='fc2')    
-        
+        net = tf.layers.dense(inputs=net, units=1024,  activation=tf.nn.relu, name='fc2')   
 
         #logits
         net = tf.layers.dense(inputs=net, units=n_classes, name='fc3')
-        
-        
-        
         ################################################################################
-
-
+        
         predictions = {
             "classes": tf.argmax(input=net, axis=1),
             "probabilities": tf.nn.softmax(net, name="softmax")
