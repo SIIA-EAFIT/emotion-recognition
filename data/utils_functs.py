@@ -2,12 +2,6 @@ import tensorflow as tf
 
 
 def _input_fn(filename , batch_size, epochs):
-        
-    """An input function for training
-
-    Taken from : https://www.tensorflow.org/guide/custom_estimators
-    
-    """
 
     # Convert the inputs to a Dataset
     dataset = tf.data.TFRecordDataset(filename)
@@ -20,30 +14,6 @@ def _input_fn(filename , batch_size, epochs):
     # Return the read end of the pipeline.
     return dataset.make_one_shot_iterator().get_next()
 
-
-
-
-def eval_input_fn(features, labels, batch_size):
-    """An input function for evaluation or prediction"""
-
-    features = tf.convert_to_tensor(features , dtype = tf.float64)
-    labels = tf.convert_to_tensor(labels ,dtype = tf.int32)
-    
-    if labels is None:
-        # No labels, use only features.
-        inputs = features
-    else:
-        inputs = (features, labels)
-
-    # Convert the inputs to a Dataset.
-    dataset = tf.data.Dataset.from_tensor_slices(inputs)
-
-    # Batch the examples
-    assert batch_size is not None, "batch_size must not be None"
-    dataset = dataset.batch(batch_size)
-
-    # Return the dataset.
-    return dataset
 
 def parse(serialized):
     """
