@@ -28,7 +28,7 @@ def from_hdf_to_tf_record(hdf_path, tf_record_path_and_name,
         batch_labels = dataset[y_dict_name][i:i+batch_size]
 
         for idx in range(len(batch_data)):
-            img = batch_data[idx , : , : ] 
+            img = batch_data[idx , : , : ]  
             label = batch_labels[idx]
             # Create a feature
             feature = {'label': _int64_feature(label),
@@ -38,6 +38,6 @@ def from_hdf_to_tf_record(hdf_path, tf_record_path_and_name,
             
             # Serialize to string and write on the file
             writer.write(example.SerializeToString())
-        
+         
     writer.close()
     sys.stdout.flush()

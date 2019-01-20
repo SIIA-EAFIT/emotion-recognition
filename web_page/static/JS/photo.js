@@ -20,8 +20,11 @@
         video: true,
         audio: false
     }, function (stream) {
-
-        video.src = URL.createObjectURL(stream); //Change this line, is deprecated;
+        try {
+            video.srcObject = stream;
+        } catch (error) {
+            video.src = window.URL.createObjectURL(stream);
+        }
         video.play();
 
     }, function (error) {
@@ -31,30 +34,94 @@
     document.getElementById('capture').addEventListener('click', function () {
         context.drawImage(video, 0, 0, 400, 300);
         photo.setAttribute('src', canvas.toDataURL('image/png'));
-        create_img();
+        // create_img();
 
     });
 
-    function create_img() {
-        var myImg = document.createElement("IMG");
-        myImg.src = canvas.toDataURL("image/png"); // this will generate base64 data
-        send_img(myImg.src);
-        // document.getElementById("img_dispplay").innerHTML = "<img src='"+x.src+"' width='400' height='300' class='img-responsive'>";
-        // document.body.appendChild(x);
-        //console.log(img.src);
+
+})();
+
+
+function send_img() {
+    //Make this url, in a different file, so can be accessed from everywhere
+    img = document.getElementById('photo');
+    emotion = document.getElementById('emotion');
+    var emotion_dict = {
+        "Angry": "../static/Imagenes/angry.jpg",
+        "Disgust": "../static/Imagenes/disgust.png",
+        "Fear": "../static/Imagenes/fear.png",
+        "Happy": "../static/Imagenes/happy.jpg",
+        "Sad": "../static/Imagenes/sad.jpg",
+        "Surprise": "../static/Imagenes/surprise.jpg",
+        "Neutral": "../static/Imagenes/neutral.png"
     }
 
-    function send_img(image) {
-        //Make this url, in a different file, so will be accessed from anywhere
-        const url = "http://localhost:8000/saveImage";
-        fetch(url, {
-            method: "POST",
-            body: JSON.stringify(image),
-            headers:{
-                'Content-Type': 'application/json'
-              }
-            }).then(res => res.json())
-            .catch(error => console.error('Error:', error))
-            .then(response => console.log('Success:', response));
+    const url = "http://localhost:8000/saveImage";
+    fetch(url, {
+        method: "POST",
+        body: JSON.stringify(img.src),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then(res => res.json())
+        .catch(error => console.error('Error:', error))
+        .then(response => {
+            console.log('Success:', response);
+            emotion.src = emotion_dict[response.result];
+            var ctx = document.getElementById("myChart").getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ["Angry", "Disgust", "Fear", "Happy", "Sad", "Surprise", "Neutral"],
+                    datasets: [{
+                        label: 'Probability of feeling each emotion',
+                        data: response.prob ,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(255, 206, 86, 0.2)',
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(153, 102, 255, 0.2)',
+                            'rgba(255, 159, 64, 0.2)'
+                        ],
+                        borderColor: [
+                            'rgba(255,99,132,1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    }
+                }
+            });
+
+        });
+}
+
+function previewFile() {
+    var preview = document.querySelector('img');
+    var file = document.querySelector('input[type=file]').files[0];
+    var reader = new FileReader();
+
+    reader.onloadend = function () {
+        photo.setAttribute('src', reader.result);
+
     }
-})();
+
+    if (file) {
+        reader.readAsDataURL(file);
+    } else {
+        preview.src = "";
+    }
+}

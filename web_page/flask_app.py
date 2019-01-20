@@ -3,8 +3,13 @@ import cv2
 import base64
 import os
 import io
+import sys
+import numpy as np
 from imageio import imread
-import sqlite3 as sql
+
+sys.path.append("..")  # Adds previous directory to python modules path.
+
+from model.emotion import Emotion
 
 app = Flask(__name__)
 
@@ -44,20 +49,30 @@ def upload():
 
 @app.route("/saveImage" , methods=['POST'])
 def image():
+    result_dict = {0: "Angry", 1: "Disgust", 2: "Fear", 3: "Happy", 4: "Sad", 5: "Surprise", 6: "Neutral"}
 
     if(request.get_json()):
         image = request.get_json()[22:]  #removing the image header
         decoded_image = base64.b64decode(image)
         img = imread(io.BytesIO(decoded_image))
+        img = cv2.resize(img , (48,48))
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        img = img.astype(np.float32)
 
-        
+
+        emotion = Emotion()
+        emotion.load_model('../data/tensorflow-graph')
+        results = emotion.predict( img , False)
+        result = next(results)
+        _class = result_dict[result["classes"]]
+        probabilities = result["probabilities"]
 
         #This code is useful if the image is needed to be saved as jpg instead of a vector
         # image_to_be_saved = "./images/current_image.jpg"
         # with open(image_to_be_saved,'wb' ) as img:
         #      img.write(decoded_image)
 
-        resp = jsonify(success=True)
+        resp = jsonify(success=True , result = _class, prob = probabilities.tolist())
     else:
         resp = jsonify(success=False)
 

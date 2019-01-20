@@ -33,45 +33,65 @@ Try it
     </div>
 </nav>
 
+<br />
+<br />
 <!-- Page Content -->
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
 
-<h2> You can upload an image from your computer.. </h2>
-<div class="container"style="display:flex;justify-content:center;align-items:center;">
+            <h2 class="myh2"> You can upload an image from your computer.. </h2>
 
-    <br />
-    <br />
-    <br />
-    <br />
+            <input type="file" onchange="previewFile()"><br>
+            <img src="" height="200">
 
-        <form id="upload-form" action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
-            <input class="button" type="file" name="file" accept="image/*" multiple>
+            <img id="photo" src="https://scontent.feoh6-1.fna.fbcdn.net/v/t1.0-9/47441256_942104325984469_7365352421347819520_n.jpg?_nc_cat=102&_nc_ht=scontent.feoh6-1.fna&oh=943f844e4ebf138b96815b1918c8a1db&oe=5C9B3A6F"
+                width="380" height="300" alt="Your photo">
 
-            </br>
-
-            <input type="submit" value="Upload">
-        </form>
-
-</div>
-<br>
-<h2> Or take one right now!! </h2>
-<div class="container"style="display:flex;justify-content:center;align-items:center;">
-
-        <div class="booth">
-            <video id="video" width="380" height="300"></video>
-            <a href="#" id="capture" class="boot-capture-button"> Take photo </a>
-            <canvas id="canvas" width="400" height="300"></canvas>
-            <img id="photo" src= "https://scontent.feoh6-1.fna.fbcdn.net/v/t1.0-9/47441256_942104325984469_7365352421347819520_n.jpg?_nc_cat=102&_nc_ht=scontent.feoh6-1.fna&oh=943f844e4ebf138b96815b1918c8a1db&oe=5C9B3A6F"
-                width="380"
-                height="300"
-                alt="Your photo">
         </div>
-    
+        <div class="col-md-6">
+            <div class="container">
+                <h2 class="myh2"> Or take one right now!! </h2>
+                <br />
+                <div class="booth">
+                    <video id="video" width="380" height="300"></video>
+                    <a href="#" id="capture" class="boot-capture-button"> Take photo </a>
+                    <canvas id="canvas" width="400" height="300"></canvas>
+
+                    <button type="button" class="predict" data-toggle="modal" data-target=".bd-example-modal-lg"
+                        onclick="send_img()">
+                        Predict!</button>
+                    <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <img id="emotion" , src="" width="380" height="300">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <canvas id="myChart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        Architecture : AlexNet,
+                                        Optimizer : Adam,
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+<script type="text/javascript" src="jscript/graph.js"></script>
 <script src="../static/JS/photo.js"></script>
-
-
-
 
 <br />
 <br />

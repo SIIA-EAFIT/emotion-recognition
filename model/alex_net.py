@@ -12,6 +12,7 @@ def model(features , labels , mode, params):
      
         ################################################################################
         
+
         #Input and dealing with the first dimension which is the  unknown batch size
         net = tf.keras.Input( shape = (  img_height , img_width ) , tensor = features, batch_size = batch_size)
         net = tf.reshape(features, shape=( -1 , img_height, img_width, n_channels))
