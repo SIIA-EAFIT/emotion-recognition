@@ -6,9 +6,6 @@
     photo = document.getElementById('photo')
     vendorUrl = window.URL || window.webkitURL;
 
-    // const mediaSource = new MediaSource();
-    // const video = document.createElement('video');
-    // video.srcObject = mediaSource;
 
     navigator.getMedia = (navigator.getUserMedia ||
         navigator.webkitGetUserMedia ||
